@@ -41,5 +41,5 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Framework :: Django",
     ],
-    install_requires=["django-appconf >= 0.4"],
+    install_requires=["django-appconf >= 0.4", "semver"],
 )
