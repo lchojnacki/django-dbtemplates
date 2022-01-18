@@ -2,7 +2,7 @@ import posixpath
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ungettext, ugettext_lazy as _
+from django.utils.translation import ngettext, gettext_lazy as _
 from django.utils.safestring import mark_safe
 
 from dbtemplates.conf import settings
@@ -33,10 +33,7 @@ class CodeMirrorTextArea(forms.Textarea):
         js = [posixpath.join(settings.DBTEMPLATES_MEDIA_PREFIX, 'js/codemirror.js')]
 
     def render(self, name, value, attrs=None, renderer=None):
-        result = []
-        result.append(
-            super(CodeMirrorTextArea, self).render(name, value, attrs))
-        result.append(u"""
+        result = [super().render(name, value, attrs), u"""
 <script type="text/javascript">
   var editor = CodeMirror.fromTextArea('id_%(name)s', {
     path: "%(media_prefix)sjs/",
@@ -49,7 +46,7 @@ class CodeMirrorTextArea(forms.Textarea):
     lineNumbers: true
   });
 </script>
-""" % dict(media_prefix=settings.DBTEMPLATES_MEDIA_PREFIX, name=name))
+""" % dict(media_prefix=settings.DBTEMPLATES_MEDIA_PREFIX, name=name)]
         return mark_safe(u"".join(result))
 
 
@@ -119,7 +116,7 @@ class TemplateAdmin(TemplateModelAdmin):
         for template in queryset:
             remove_cached_template(template)
         count = queryset.count()
-        message = ungettext(
+        message = ngettext(
             "Cache of one template successfully invalidated.",
             "Cache of %(count)d templates successfully invalidated.",
             count)
@@ -131,7 +128,7 @@ class TemplateAdmin(TemplateModelAdmin):
         for template in queryset:
             add_template_to_cache(template)
         count = queryset.count()
-        message = ungettext(
+        message = ngettext(
             "Cache successfully repopulated with one template.",
             "Cache successfully repopulated with %(count)d templates.",
             count)
@@ -147,7 +144,7 @@ class TemplateAdmin(TemplateModelAdmin):
                 errors.append('%s: %s' % (template.name, error))
         if errors:
             count = len(errors)
-            message = ungettext(
+            message = ngettext(
                 "Template syntax check FAILED for %(names)s.",
                 "Template syntax check FAILED for %(count)d templates: %(names)s.",
                 count)
@@ -155,7 +152,7 @@ class TemplateAdmin(TemplateModelAdmin):
                               {'count': count, 'names': ', '.join(errors)})
         else:
             count = queryset.count()
-            message = ungettext(
+            message = ngettext(
                 "Template syntax OK.",
                 "Template syntax OK for %(count)d templates.", count)
             self.message_user(request, message % {'count': count})
